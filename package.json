@@ -1,0 +1,28 @@
+{
+  "name": "generator-open-element",
+  "version": "0.0.0",
+  "description": "Yeoman generator for Polymer open-elements",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apowers313/generator-open-element.git"
+  },
+  "author": "Adam Powers <apowers@ato.ms>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/apowers313/generator-open-element/issues"
+  },
+  "homepage": "https://github.com/apowers313/generator-open-element#readme",
+  "dependencies": {
+    "linewrap": "^0.2.1",
+    "word-wrap": "^1.1.0",
+    "yeoman-generator": "^0.20.3",
+    "yosay": "^1.0.5"
+  },
+  "devDependencies": {
+    "commitizen": "^1.0.4",
+    "conventional-changelog": "^0.4.3"
+  }
+}
