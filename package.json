@@ -16,8 +16,12 @@
   },
   "homepage": "https://github.com/apowers313/generator-open-element#readme",
   "dependencies": {
+    "deasync": "^0.1.2",
+    "git-config": "0.0.7",
     "linewrap": "^0.2.1",
-    "word-wrap": "^1.1.0",
+    "npmconf": "^2.1.2",
+    "open": "0.0.5",
+    "validator": "^4.0.6",
     "yeoman-generator": "^0.20.3",
     "yosay": "^1.0.5"
   },
