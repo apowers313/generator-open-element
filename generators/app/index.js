@@ -12,7 +12,7 @@ module.exports = yeoman.generators.Base.extend({
             this.log.debug = this.log;
             this.log.warn = this.log;
             this.log.error = this.log;
-            this.log.debug ("Initializing...");
+            this.log.debug("Initializing...");
         },
         gitConfig: function () {
             var done = this.async();
@@ -35,7 +35,7 @@ module.exports = yeoman.generators.Base.extend({
         }
     },
     prompting: function () {
-    	this.log.debug ("Prompting...");
+        this.log.debug("Prompting...");
         this.log(yosay("Yo momma!"));
 
         var ask = function (info, question, browser, wait, url) {
@@ -69,7 +69,7 @@ module.exports = yeoman.generators.Base.extend({
                     );
                 },
                 default: false
-            },
+            }, // TODO: validate
             /**
              * Ask for the project name
              */
@@ -90,8 +90,7 @@ module.exports = yeoman.generators.Base.extend({
                         "First, let's start with some basic information:",
                         "Please enter the name for your project (e.g. - for the top of your README file): "
                     );
-                },
-
+                }, // TODO: default and / or validate; can't be blank
             },
             /**
              * Ask for the element name
@@ -213,6 +212,37 @@ module.exports = yeoman.generators.Base.extend({
                 }.bind(this)
             },
             /**
+             * GitHub API Key
+             */
+            {
+            	// always, but we need to create github_slug for some questions down the road
+            	when: function (answers) {
+            		this.answers.github_slug = this.answers.github_account + "/" + this.answers.github_repo;
+            		return true;
+            	},
+            	type: "input",
+            	name: "github_token",
+            	message: function (answers) {
+            		return ask(
+						"You will need to create a GitHub Personal Access Token so" +
+						"that Travis can push your docs to GitHub. Please create" +
+						"a new GitHub Personal Access Token." +
+						"\n" +
+						"(The default options and scopes should work fine.)",
+						"Please enter your GitHub Personal Access Token",
+						answers.browser,
+						5,
+						"https://github.com/settings/tokens/new"
+            		);
+            	},
+            	validate: function (str) {
+                    // check format
+                    if (validator.isURL(str) &&
+                        str.match(/^[0-9A-Fa-f]{40}$/)) return true;
+                    return "Not a valid GitHub Personal Access Token. Expected something like: f0e1d2c31a2b0badc0de0a1b2c3d4e5fabc12342";
+            	}
+            },
+            /**
              * NPM API Token
              */
             {
@@ -237,19 +267,123 @@ module.exports = yeoman.generators.Base.extend({
                 }.bind(this),
             },
             /**
-             * Travis CI
+             * Travis CI login
              */
+            {
+                type: "confirm",
+                name: "travis_login_ok",
+                message: function (answers) {
+                    return ask(
+                        "You will need to use Travis CI for Continuous Integration" +
+                        "Please login to Travis CI." +
+                        "(Create a new account if you don't already have one).",
+                        "Did you login to Travis CI?",
+                        answers.brower,
+                        5,
+                        "https://travis-ci.org/profile/" + answers.github_account
+                    );
+                }
+            }, // TODO: validate
+            /**
+             * Travis CI enable
+             */
+            {
+                type: "confirm",
+                name: "travis_ok",
+                message: function (answers) {
+                    return ask(
+                        "Now you will need to turn on your new repository." +
+                        "Find " + answers.github_slug + " in the list and click on the grey 'x'" +
+                        "so that it becomes a green checkmark.",
+                        "Did you add " + answers.github_slug + " to Travis CI?",
+                        answers.browser,
+                        5,
+                        "https://travis-ci.org/profile/" + answers.github_account
+                    );
+                }
+            }, // TODO: validate
+            /**
+             * SauceLabs Sign-in
+             */
+            {
+                type: "confirm",
+                name: "saucelabs_account_ok",
+                message: function (answers) {
+                    return ask(
+                        "Please sign-in or create an account at SauceLabs.",
+                        "Did you create an account at SauceLabs?",
+                        answers.browser,
+                        3,
+                        "https://saucelabs.com/signup/plan/OSS"
+                    );
+                }
+            },
+            /**
+             * SauceLabs Access Key
+             */
+            {
+                type: "input",
+                name: "saucelabs_account_key",
+                message: function (answers) {
+                    return ask(
+                        "Enter your SauceLabs Access Key. You can find the key" +
+                        "on the left-hand side of the page underneath your account" +
+                        "information.",
+                        "Please enter your SauceLabs Account Key",
+                        answers.browser,
+                        3,
+                        "https://saucelabs.com/account/profile"
+                    );
+                }
+            },
+            /**
+             * Coveralls Login
+             */
+            {
+            	type: "confirm",
+            	name: "coveralls_login_ok",
+            	message: function (answers) {
+            		return ask(
+            			"Login to your Coveralls account or create a new one (it's free!)",
+            			"Did you login to Coveralls?",
+            			answers.browser,
+            			3,
+            			"https://coveralls.io/sign-up"
+            		);
+            	}
+            }, // TODO: validate
+            /**
+             * Coveralls config
+             */
+            {
+            	type: "confirm",
+            	name: "coveralls_ok",
+            	message: function (answers) {
+            		return ask(
+						"Now you will need to add " + answers.github_slug + " to Coveralls. Find " + answers.github_slug +
+						"in the list and click the grey 'off' button so that it turns" +
+						"into a green 'on' button." +
+						"\n" +
+						"It may take a minute or two for Coveralls to see your new repo..." +
+						"(Hit refresh if you get bored)",
+						"Did you add " + answers.github_slug + " to Coveralls?",
+						answers.browser,
+						5,
+						"https://coveralls.io/refresh"
+            		);
+            	}
+            } // TODO: validate
         ], function (answers) {
             this.log("Answers:", JSON.stringify(answers));
             this.answers = answers;
         }.bind(this));
     },
     configuring: function () {
-    	this.log.debug ("Configuring...");
-        // this.answers.github_slug = this.answers.github_account + "/" + this.answers.github_repo;
+        this.log.debug("Configuring...");
         // TODO: create NPM API key
         if (answers.npm_token === "Create New Token") {
-        	this.log.debug ("Creating new NPM token");
+            this.log.debug("Creating new NPM token");
+            this.log.error("!!! NOT IMPLEMENTED YET");
         }
     },
     writing: function () {
